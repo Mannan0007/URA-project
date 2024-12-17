@@ -1,145 +1,152 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./Cab.css";
+import "../styles/cab.css"; // Ensure this is the correct path to your CSS file
 import videoBg from "../images/cabbooking.mp4"; // Correct import path
 import Navbar from "./Navbar";
-import Footer from "./Footer";
 
 const Cab = () => {
+  const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [cabData, setCabData] = useState([]);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [bookingDetails, setBookingDetails] = useState(null); // Track the booking details
 
+  // Fetch cab details function
   const fetchCabDetails = async () => {
-    setError("");
-    setLoading(true);
-    setCabData([]);
-
-    if (!destination.trim()) {
-      setError("Please enter a destination.");
-      setLoading(false);
-      return;
-    }
-
     try {
-      const response = await axios.get(`http://localhost:3000/api/cabs`, {
-        params: { destination },
+      setError(""); // Clear previous errors
+      setCabData([]); // Reset previous data
+
+      if (!origin || !destination) {
+        setError("Please enter both origin and destination.");
+        return;
+      }
+
+      // API request to fetch cab details based on origin and destination
+      const response = await axios.get("http://localhost:3000/api/cabs", {
+        params: { origin, destination }, // Send origin and destination as query parameters
       });
+
+      // Update cab data state with the response
       setCabData(response.data);
     } catch (err) {
-      setError(err.response?.data?.message || "Error fetching cab details.");
-    } finally {
-      setLoading(false);
+      setError("No cabs found for the specified locations.");
     }
   };
 
-  return (
-    <div>
-      {/* Navbar */}
-      <Navbar />
+  // Handle book now action
+  const handleBookNow = (cab) => {
+    setBookingDetails({
+      cab_number: cab.cab_number,
+      cab_name: cab.cab_name,
+      price_per_person: cab.price,
+      passengers: 1, // Default number of passengers
+      date: "",
+    });
+  };
 
-      {/* Video Background */}
-      <video autoPlay loop muted className="video-background">
+  // Handle changes in booking form
+  const handleBookingChange = (e) => {
+    const { name, value } = e.target;
+    setBookingDetails((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Calculate total price based on number of passengers
+  const calculateTotalPrice = () => {
+    return bookingDetails.price_per_person * bookingDetails.passengers;
+  };
+
+  // Confirm booking
+  const confirmBooking = () => {
+    alert(
+      `Booking confirmed!\nCab: ${bookingDetails.cab_name}\nDate: ${bookingDetails.date}\nPassengers: ${bookingDetails.passengers}\nTotal Price: ₹${calculateTotalPrice()}`
+    );
+    setBookingDetails(null); // Reset after confirmation
+  };
+
+  return (
+    <>
+    <Navbar/>
+    
+    <video autoPlay loop muted className="video-background">
         <source src={videoBg} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
+    <div>
+      <h1>Cab Booking</h1>
 
-      {/* Main Content */}
-      <div className="cab-container">
-        <h1 className="cab-heading">Cab Search</h1>
+      {/* Search for cabs */}
+      <div className="input-fields">
+        <input
+          type="text"
+          placeholder="Enter Origin"
+          value={origin}
+          onChange={(e) => setOrigin(e.target.value)}
+        />
         <input
           type="text"
           placeholder="Enter Destination"
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginBottom: "10px",
-            borderRadius: "5px",
-            border: "1px solid #ccc",
-          }}
         />
-        <button
-          onClick={fetchCabDetails}
-          style={{
-            width: "100%",
-            padding: "10px",
-            backgroundColor: "#FF4C4C", // Red color
-            color: "#fff",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-          }}
-        >
-          Search
-        </button>
-
-        {loading && <p>Loading...</p>}
-        {error && <p style={{ color: "red" }}>{error}</p>}
-
-        {cabData.length > 0 && (
-          <div style={{ marginTop: "20px" }}>
-            <h2 style={{ textAlign: "center" }}>AVAILABLE LOCATIONS</h2>
-            <div>
-              {cabData.map((cab, index) => (
-                <div
-                  key={index}
-                  style={{
-                    marginBottom: "15px",
-                    padding: "15px",
-                    border: "1px solid #ddd",
-                    borderRadius: "5px",
-                    backgroundColor: "#f9f9f9",
-                  }}
-                >
-                  <div style={{ fontWeight: "bold", fontSize: "16px" }}>
-                    <strong>Name:</strong> {cab.name}
-                  </div>
-                  <div>
-                    <strong>Type:</strong> {cab.type}
-                  </div>
-                  <div>
-                    <strong>City:</strong> {cab.city}
-                  </div>
-                  <div>
-                    <strong>Country:</strong> {cab.country}
-                  </div>
-                  <div>
-                    <strong>Latitude:</strong> {cab.latitude}
-                  </div>
-                  <div>
-                    <strong>Longitude:</strong> {cab.longitude}
-                  </div>
-                  <div>
-                    <strong>Google Place ID:</strong> {cab.googlePlaceId}
-                  </div>
-                  {/* Book Button */}
-                  <button
-                    style={{
-                      marginTop: "10px",
-                      padding: "10px 15px",
-                      backgroundColor: "#007BFF", // Blue color
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "5px",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => alert(`Booked: ${cab.name}`)}
-                  >
-                    Book
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
+        <button onClick={fetchCabDetails}>Search Cabs</button>
 
-      {/* Footer */}
-      <Footer />
+      {/* Error message */}
+      {error && <p className="error">{error}</p>}
+
+      {/* Display cab details */}
+      {cabData.length > 0 && (
+        <div>
+          {/* <h2>Available Cabs</h2> */}
+          {cabData.map((cab, index) => (
+            <div key={index} className="cab-card">
+              <p><strong>Cab Number:</strong> {cab.cab_number}</p>
+              <p><strong>Cab Name:</strong> {cab.cab_name}</p>
+              <p><strong>From:</strong> {cab.origin}</p>
+              <p><strong>To:</strong> {cab.destination}</p>
+              <p><strong>Departure Time:</strong> {cab.departure_time}</p>
+              <p><strong>Arrival Time:</strong> {cab.arrival_time}</p>
+              <p><strong>Cab Type:</strong> {cab.cab_type}</p>
+              <p><strong>Price:</strong> ₹{cab.price}</p>
+              <button onClick={() => handleBookNow(cab)}>Book Now</button>
+
+              {/* Booking Section */}
+              {bookingDetails?.cab_number === cab.cab_number && (
+                <div className="booking-section">
+                  <h3>Book Your Cab</h3>
+                  <label>Date of Travel:</label>
+                  <input
+                    type="date"
+                    name="date"
+                    value={bookingDetails.date}
+                    onChange={handleBookingChange}
+                  />
+                  <label>Number of Passengers:</label>
+                  <input
+                    type="number"
+                    name="passengers"
+                    min="1"
+                    value={bookingDetails.passengers}
+                    onChange={(e) =>
+                      handleBookingChange({
+                        target: { name: "passengers", value: parseInt(e.target.value) || 1 },
+                      })
+                    }
+                  />
+                  <p>
+                    <strong>Total Price:</strong> ₹{calculateTotalPrice()}
+                  </p>
+                  <button onClick={confirmBooking}>Confirm Booking</button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
+    </>
+
   );
 };
 

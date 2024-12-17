@@ -1,128 +1,178 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./flight.css"; // Import CSS file
-import videoBg from "../images/flightbooking.mp4"; // Replace with correct path to your flight video background
-import Navbar from "./Navbar"; // Import the Navbar component
+import "../styles/flights.css"; // Import your CSS
+import Navbar from "./Navbar";
+import Footer from "./Footer";
+import videoBg from "../images/flightbooking.mp4"; // Replace with correct path to your video
 
-const FlightSearch = () => {
-  const [flightNumber, setFlightNumber] = useState("");
-  const [flightDetails, setFlightDetails] = useState(null);
+const FlightDetails = () => {
+  const [origin, setOrigin] = useState("");
+  const [destination, setDestination] = useState("");
+  const [flightData, setFlightData] = useState([]);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [bookingDetails, setBookingDetails] = useState(null); // Track which flight is being booked
 
-  const handleFlightSearch = async () => {
-    setError("");
-    setFlightDetails(null);
-    setLoading(true);
-
-    if (!flightNumber.trim()) {
-      setError("Please enter a flight number.");
-      setLoading(false);
-      return;
-    }
-
+  // Fetch flight details function
+  const fetchFlightDetails = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:3000/api/flights?flightNumber=${flightNumber}`
-      );
+      setError(""); // Clear previous errors
+      setFlightData([]); // Reset previous data
 
-      console.log("API Response:", response.data);
-
-      if (response.data && response.data.length > 0) {
-        setFlightDetails(response.data[0]);
-      } else {
-        setError("No details found for the provided flight number.");
+      // Validate inputs
+      if (!origin || !destination) {
+        setError("Please enter both origin and destination.");
+        return;
       }
-    } catch (error) {
-      console.error("Error fetching flight details:", error);
-      setError(
-        error.response?.data?.message ||
-          "Failed to fetch flight details. Please try again."
-      );
-    } finally {
-      setLoading(false);
+
+      // API request to fetch flight details
+      const response = await axios.get("http://localhost:3000/api/flights", {
+        params: { origin, destination },
+      });
+
+      // Update state with flight data
+      setFlightData(response.data);
+    } catch (err) {
+      // Handle errors
+      if (err.response && err.response.status === 404) {
+        setError("No flights found for the specified locations.");
+      } else {
+        setError("Failed to fetch flight details. Please try again.");
+      }
     }
   };
 
-  // Handle booking confirmation
-  const handleBookFlight = () => {
-    if (flightDetails) {
-      alert(`Booked Flight: ${flightDetails.airline_name} (${flightDetails.flnr})`);
-    }
+  // Function to open booking section
+  const handleBookNow = (flight) => {
+    setBookingDetails({
+      flight_name: flight.flight_name,
+      flight_number: flight.flight_number,
+      price_per_person: flight.price, // Set the base price
+      passengers: 1, // Default to 1 passenger
+      date: "",
+    });
+  };
+
+  // Function to handle booking form inputs
+  const handleBookingChange = (e) => {
+    const { name, value } = e.target;
+    setBookingDetails((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Calculate total price based on number of passengers
+  const calculateTotalPrice = () => {
+    return bookingDetails.price_per_person * bookingDetails.passengers;
+  };
+
+  // Function to confirm booking
+  const confirmBooking = () => {
+    alert(
+      `Booking confirmed!\nFlight: ${bookingDetails.flight_name}\nDate: ${bookingDetails.date}\nPassengers: ${bookingDetails.passengers}\nTotal Price: ₹${calculateTotalPrice()}`
+    );
+    setBookingDetails(null); // Reset after confirmation
   };
 
   return (
-    <div>
-      {/* Navbar */}
+    <>
       <Navbar />
 
-      {/* Video Background */}
       <video autoPlay loop muted className="video-background">
         <source src={videoBg} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
+      <div className="flight-details-container">
+        <h1>Search Flight Details</h1>
+        <div className="input-fields">
+          <input
+            type="text"
+            placeholder="Enter Origin Airport"
+            value={origin}
+            onChange={(e) => setOrigin(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Enter Destination Airport"
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
+          />
+        </div>
+        <button onClick={fetchFlightDetails}>Search</button>
 
-      {/* Main Content */}
-      <div className="flight-container">
-        <h1 className="flight-heading">Flight Search</h1>
-        <input
-          type="text"
-          placeholder="Enter Flight Number (e.g., AI2928)"
-          value={flightNumber}
-          onChange={(e) => setFlightNumber(e.target.value)}
-        />
-        <button onClick={handleFlightSearch}>Search Flight</button>
+        {error && <p className="error">{error}</p>}
 
-        {loading && <p>Loading...</p>}
-        {error && <p style={{ color: "red" }}>{error}</p>}
-
-        {flightDetails && (
-          <div className="flight-details">
+        {flightData.length > 0 && (
+          <div>
             <h2>Flight Details</h2>
-            <p>
-              <strong>Flight:</strong> {flightDetails.airline_name} (
-              {flightDetails.flnr})
-            </p>
-            <p>
-              <strong>Departure:</strong> {flightDetails.departure_name} (
-              {flightDetails.departure_city})
-            </p>
-            <p>
-              <strong>Departure Time:</strong>{" "}
-              {flightDetails.scheduled_departure_local}
-            </p>
-            <p>
-              <strong>Arrival:</strong> {flightDetails.arrival_name} (
-              {flightDetails.arrival_city})
-            </p>
-            <p>
-              <strong>Arrival Time:</strong>{" "}
-              {flightDetails.scheduled_arrival_local}
-            </p>
-            <p>
-              <strong>Status:</strong> {flightDetails.status}
-            </p>
+            {flightData.map((flight, index) => (
+              <div key={index} className="flight-card">
+                <p>
+                  <strong>Flight Number:</strong> {flight.flight_number}
+                </p>
+                <p>
+                  <strong>Name:</strong> {flight.flight_name}
+                </p>
+                <p>
+                  <strong>From:</strong> {flight.origin}
+                </p>
+                <p>
+                  <strong>To:</strong> {flight.destination}
+                </p>
+                <p>
+                  <strong>Departure Time:</strong> {flight.departure_time}
+                </p>
+                <p>
+                  <strong>Arrival Time:</strong> {flight.arrival_time}
+                </p>
+                <p>
+                  <strong>Price:</strong> ₹{flight.price}
+                </p>
+                <button
+                  className="book-now-button"
+                  onClick={() => handleBookNow(flight)}
+                >
+                  Book Now
+                </button>
 
-            {/* Book Button */}
-            <button
-              onClick={handleBookFlight}
-              style={{
-                marginTop: "10px",
-                padding: "10px 15px",
-                backgroundColor: "#007BFF",
-                color: "#fff",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Book Flight
-            </button>
+                {/* Booking Section */}
+                {bookingDetails?.flight_number === flight.flight_number && (
+                  <div className="booking-section">
+                    <h3>Book Your Flight</h3>
+                    <div className="booking-inputs">
+                      <label>Date of Travel:</label>
+                      <input
+                        type="date"
+                        name="date"
+                        value={bookingDetails.date}
+                        onChange={handleBookingChange}
+                      />
+                      <label>Number of Passengers:</label>
+                      <input
+                        type="number"
+                        name="passengers"
+                        min="1"
+                        value={bookingDetails.passengers}
+                        onChange={(e) =>
+                          handleBookingChange({
+                            target: { name: "passengers", value: parseInt(e.target.value) || 1 },
+                          })
+                        }
+                      />
+                    </div>
+                    <p>
+                      <strong>Total Price:</strong> ₹{calculateTotalPrice()}
+                    </p>
+                    <button className="confirm-booking" onClick={confirmBooking}>
+                      Confirm Booking
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         )}
       </div>
-    </div>
+      {/* <Footer /> */}
+    </>
   );
 };
 
-export default FlightSearch;
+export default FlightDetails;

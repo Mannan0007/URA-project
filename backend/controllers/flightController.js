@@ -1,9 +1,8 @@
 import flights from '../data/flights.js';  // Ensure this path is correct
-
-// Controller to fetch flight details based on origin and destination
 export const getFlightDetails = async (req, res) => {
     const { origin, destination } = req.query; // Get origin and destination from query parameters
 
+    // Log the received values
     console.log('Received request for:', { origin, destination });
 
     // Check if both origin and destination are provided
@@ -15,6 +14,9 @@ export const getFlightDetails = async (req, res) => {
     if (!Array.isArray(flights)) {
         return res.status(500).json({ message: 'Flight data is not an array' });
     }
+
+    // Log the flight data for debugging
+    console.log("Flight Data:", flights);
 
     // Filter flights matching both origin and destination
     const matchingFlights = flights.filter((flight) =>
