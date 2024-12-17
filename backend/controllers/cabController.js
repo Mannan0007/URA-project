@@ -1,47 +1,24 @@
-import axios from 'axios';
+import cabs from '../data/cab.js';  // Import the JS file with cab data
 
 export const getCabDetails = async (req, res) => {
-  const { destination } = req.query;
+    const { origin, destination } = req.query; // Expect origin and destination from query parameters
 
-  if (!destination) {
-    return res.status(400).json({ message: 'Destination is required' });
-  }
-
-  const options = {
-    method: 'GET',
-    url: 'https://booking-com15.p.rapidapi.com/api/v1/taxi/searchLocation',
-    params: { query: destination },
-    headers: {
-      'x-rapidapi-key': 'fb5e5893d3msh5ebc6d76cbde42bp1453f8jsnb2c285f5afaa',
-      'x-rapidapi-host': 'booking-com15.p.rapidapi.com',
-    },
-  };
-
-  try {
-    const response = await axios.request(options);
-
-    // Extract the data array from the API response
-    const locations = response.data?.data || [];
-
-    // Check if the locations array is empty
-    if (locations.length === 0) {
-      return res.status(404).json({ message: 'No locations found for the specified destination' });
+    // Check if both origin and destination are provided
+    if (!origin || !destination) {
+        return res.status(400).json({ message: 'Origin and destination locations are required' });
     }
 
-    // Process and return the relevant fields
-    const formattedLocations = locations.map(location => ({
-      name: location.name || 'N/A',
-      type: location.types || 'N/A',
-      city: location.city || 'N/A',
-      country: location.country || 'N/A',
-      latitude: location.latitude || 'N/A',
-      longitude: location.longitude || 'N/A',
-      googlePlaceId: location.googlePlaceId || 'N/A',
-    }));
+    // Filter cabs matching both origin and destination
+    const matchingCabs = cabs.cabs.filter((cab) => 
+        cab.origin.toLowerCase() === origin.toLowerCase() &&
+        cab.destination.toLowerCase() === destination.toLowerCase()
+    );
 
-    res.status(200).json(formattedLocations);
-  } catch (error) {
-    console.error('Error fetching location data:', error.message);
-    res.status(500).json({ message: 'Error fetching location data' });
-  }
+    // If no matching cabs are found, return a 404 error
+    if (matchingCabs.length === 0) {
+        return res.status(404).json({ message: 'No cabs found for the specified locations' });
+    }
+
+    // Return the matching cab details
+    res.status(200).json(matchingCabs);
 };
