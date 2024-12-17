@@ -14,7 +14,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  color: white;
+  color: rgb(254, 250, 250);
   z-index: 2;
   animation: slideUp 1s ease-out;
 }
@@ -33,7 +33,7 @@
 .explore-btn {
   padding: 1rem 2rem;
   font-size: 1.1rem;
-  background: #0077B6;
+  background: #155b81;
   color: white;
   border: none;
   border-radius: 5px;
@@ -149,7 +149,7 @@
   left: 0;
   width: 100%;
   height: 80px; /* Adjust based on your navbar height */
-  background: #333;
+  background: #d7d5d5;
   z-index: 1000;
 }
 

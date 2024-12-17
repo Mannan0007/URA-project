@@ -18,7 +18,7 @@ body {
 /* Navbar Styles */
 .navbar {
   width: 100%;
-  background-color: #0077B6;
+  background-color: #5a9f83;
   color: white;
   padding: 1rem 2rem;
   position: fixed;
@@ -58,7 +58,7 @@ body {
 .explore-btn {
   padding: 1rem 2rem;
   font-size: 1.1rem;
-  background: #0077B6;
+  background: #6b2045;
   color: white;
   border: none;
   border-radius: 5px;

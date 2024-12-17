@@ -11,17 +11,24 @@ const destinations = [
   },
   {
     id: 2,
-    name: 'Santorini, Greece',
+    name: 'Paris, France',
     description: 'Stunning white architecture and Mediterranean beauty',
     price: '₹129900',
-    image: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8'
+    image: 'https://images.pexels.com/photos/1850619/pexels-photo-1850619.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
   },
   {
     id: 3,
-    name: 'Swiss Alps',
+    name: 'Tokyo, Newyork',
     description: 'Majestic mountains and scenic landscapes',
     price: '₹149900',
-    image: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7'
+    image: 'https://images.pexels.com/photos/161309/traditional-and-technology-zojoji-temple-tokyo-culture-161309.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
+  },
+  {
+    id: 4,
+    name: 'London, England',
+    description: 'Majestic mountains and scenic landscapes',
+    price: '₹149900',
+    image: 'https://images.pexels.com/photos/1796715/pexels-photo-1796715.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
   }
 ];
 

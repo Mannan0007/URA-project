@@ -18,7 +18,7 @@ const Hero = () => {
         <button className="explore-btn" onClick={scroll}>Start Exploring</button>
       </div>
       <div className="image-slider">
-        <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e" alt="Nature" />
+        <img src="https://images.pexels.com/photos/29793400/pexels-photo-29793400/free-photo-of-serene-snow-covered-norwegian-mountainscape.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Nature" />
       </div>
     </div>
   );

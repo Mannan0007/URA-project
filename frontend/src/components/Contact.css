@@ -84,7 +84,7 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-image: url('https://blogearns.com/wp-content/uploads/2021/06/contact-us-page-generator.jpg');
+    background-image: url('https://images.pexels.com/photos/4710785/pexels-photo-4710785.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
     background-size: cover; 
     /* Ensures the image covers the entire background */ 
     background-position: center; /* Centers the image */ 
@@ -92,10 +92,10 @@
 }
 
 .contact__form {
-    max-width: 600px;
-    width: 100%;
-    background: #fff; /* Form background color */
-    padding: 25px 25px 30px;
+    max-width: 540px;
+    width: 80%;
+    background: #eef0f3; /* Form background color */
+    padding: 15px 15px 15px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(199, 14, 14, 0.1);
     color: #333;
@@ -122,7 +122,7 @@
     width: 100%; /* Fix input width to be full width of container */
     height: 50px;
     background: transparent;
-    border: 2px solid #ccc; /* Light gray border for inputs */
+    border: 2px solid #4a4545; /* Light gray border for inputs */
     outline: none;
     border-radius: 6px;
     padding: 0 15px;
@@ -144,7 +144,7 @@
 .contact__form button {
     width: 100%;
     height: 55px;
-    background: #024D95; /* Button background color */
+    background: #1d5675; /* Button background color */
     border: none;
     border-radius: 6px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);

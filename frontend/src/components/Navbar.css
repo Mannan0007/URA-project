@@ -17,7 +17,7 @@
 .logo {
   font-size: 1.8rem;
   font-weight: bold;
-  color: #ffffff;
+  color: #1c1919;
 }
 
 /* Navbar links layout */
@@ -30,14 +30,14 @@
 /* Styling for nav-links items */
 .nav-links a {
   text-decoration: none;
-  color: #ffffff;
+  color: #0f0f0f;
   font-weight: 500;
   transition: color 0.3s ease;
 }
 
 /* Hover effect for nav-links */
 .nav-links a:hover {
-  color: #0077B6;
+  color: #1d5675;
 }
 
 /* Styling for buttons */
@@ -52,11 +52,11 @@
 .login-btn {
   background: transparent;
   border: 2px solid #ffffff;
-  color: rgb(160, 255, 96);
+  color: rgb(32, 32, 32);
 }
 
 .register-btn {
-  background: #0077B6;
+  background: #005f8d;
   color: white;
   margin-left: 1rem;
 }
@@ -78,7 +78,7 @@
 .hamburger span {
   width: 25px;
   height: 3px;
-  background: #2c3e50;
+  background: #005f8d;
   transition: all 0.3s ease;
 }
 
