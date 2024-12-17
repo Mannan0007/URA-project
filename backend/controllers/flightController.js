@@ -1,49 +1,32 @@
-import axios from 'axios';
-import Flight from '../models/flightModel.js';
+import flights from '../data/flights.js';  // Ensure this path is correct
 
+// Controller to fetch flight details based on origin and destination
+export const getFlightDetails = async (req, res) => {
+    const { origin, destination } = req.query; // Get origin and destination from query parameters
 
-export const getFlightDetailsByNumber = async (req, res) => {
-    const { flightNumber } = req.query; // Expect the flight number as a query parameter
+    console.log('Received request for:', { origin, destination });
 
-    if (!flightNumber) {
-        return res.status(400).json({ message: 'Flight number is required' });
+    // Check if both origin and destination are provided
+    if (!origin || !destination) {
+        return res.status(400).json({ message: 'Origin and destination are required' });
     }
 
-    const options = {
-        method: 'GET',
-        url: 'https://flightera-flight-data.p.rapidapi.com/flight/info',
-        params: { flnr: flightNumber }, // Passing the flight number dynamically
-        headers: {
-            'x-rapidapi-key': 'ada078e11bmsh6488eaf73e2ae03p171055jsnf589aab9d048', // Updated RapidAPI Key
-            'x-rapidapi-host': 'flightera-flight-data.p.rapidapi.com'
-        }
-    };
-
-    try {
-        const response = await axios.request(options);
-
-        // Check if the API returned any data
-        if (!response.data || Object.keys(response.data).length === 0) {
-            return res.status(404).json({ message: 'No flight data found for the provided flight number' });
-        }
-
-        res.status(200).json(response.data); // Send the flight details as the response
-    } catch (error) {
-        console.error('Error fetching flight details:', error.message);
-        res.status(500).json({ message: 'Failed to fetch flight details', error: error.message });
+    // Ensure that flights is an array before using .filter
+    if (!Array.isArray(flights)) {
+        return res.status(500).json({ message: 'Flight data is not an array' });
     }
+
+    // Filter flights matching both origin and destination
+    const matchingFlights = flights.filter((flight) =>
+        flight.origin.toLowerCase() === origin.toLowerCase() &&
+        flight.destination.toLowerCase() === destination.toLowerCase()
+    );
+
+    // If no matching flights are found, return a 404 error
+    if (matchingFlights.length === 0) {
+        return res.status(404).json({ message: 'No flights found for the specified route' });
+    }
+
+    // Return the matching flight details
+    res.status(200).json(matchingFlights);
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-

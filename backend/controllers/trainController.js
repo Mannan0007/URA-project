@@ -1,35 +1,25 @@
-import Train from '../models/trainModel.js';
-import Booking from '../models/bookingModel.js';
-import axios from 'axios';
+import trains from '../data/train.js';  // Import the JS file with train data
 
-// Controller to fetch train details
+// Controller to fetch train details based on origin and destination stations
 export const getTrainDetails = async (req, res) => {
-    const { trainNumber } = req.query; // Expect train number from query parameters
+    const { origin_station, destination_station } = req.query; // Expect origin and destination from query parameters
 
-    if (!trainNumber) {
-        return res.status(400).json({ message: 'Train number is required' });
+    // Check if both origin and destination are provided
+    if (!origin_station || !destination_station) {
+        return res.status(400).json({ message: 'Origin and destination stations are required' });
     }
 
-    const options = {
-        method: 'GET',
-        url: `https://indian-railway-irctc.p.rapidapi.com/api/trains-search/v1/train/${trainNumber}`,
-        params: {
-            isH5: 'true',
-            client: 'web'
-        },
-        headers: {
-            'x-rapidapi-key': 'fb5e5893d3msh5ebc6d76cbde42bp1453f8jsnb2c285f5afaa',
-            'x-rapidapi-host': 'indian-railway-irctc.p.rapidapi.com',
-            'x-rapid-api': 'rapid-api-database'
-        }
-    };
+    // Filter trains matching both origin and destination stations
+    const matchingTrains = trains.trains.filter((train) => 
+        train.origin_station.toLowerCase() === origin_station.toLowerCase() &&
+        train.destination_station.toLowerCase() === destination_station.toLowerCase()
+    );
 
-    try {
-        const response = await axios.request(options);
-        console.log(response.data);
-        res.status(200).json(response.data); // Return the API response to the client
-    } catch (error) {
-        console.error('Error fetching train details:', error.message);
-        res.status(500).json({ message: 'Failed to fetch train details', error: error.message });
+    // If no matching trains are found, return a 404 error
+    if (matchingTrains.length === 0) {
+        return res.status(404).json({ message: 'No trains found for the specified stations' });
     }
+
+    // Return the matching train details
+    res.status(200).json(matchingTrains);
 };
