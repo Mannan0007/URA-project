@@ -41,7 +41,7 @@ const TrainDetails = () => {
     }
   };
 
-  // Function to open booking section
+  // Function to open booking modal
   const handleBookNow = (train) => {
     setBookingDetails({
       train_number: train.train_number,
@@ -58,7 +58,7 @@ const TrainDetails = () => {
     setBookingDetails((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Calculate total price based on number of passengers
+  // Function to calculate total price
   const calculateTotalPrice = () => {
     return bookingDetails.price_per_person * bookingDetails.passengers;
   };
@@ -69,6 +69,11 @@ const TrainDetails = () => {
       `Booking confirmed!\nTrain: ${bookingDetails.train_name}\nDate: ${bookingDetails.date}\nPassengers: ${bookingDetails.passengers}\nTotal Price: ₹${calculateTotalPrice()}`
     );
     setBookingDetails(null); // Reset after confirmation
+  };
+
+  // Function to close the modal
+  const closeModal = () => {
+    setBookingDetails(null); // Reset booking details
   };
 
   return (
@@ -134,42 +139,49 @@ const TrainDetails = () => {
                 >
                   Book Now
                 </button>
-
-                {/* Booking Section */}
-                {bookingDetails?.train_number === train.train_number && (
-                  <div className="booking-section">
-                    <h3>Book Your Tickets</h3>
-                    <div className="booking-inputs">
-                      <label>Date of Travel:</label>
-                      <input
-                        type="date"
-                        name="date"
-                        value={bookingDetails.date}
-                        onChange={handleBookingChange}
-                      />
-                      <label>Number of Passengers:</label>
-                      <input
-                        type="number"
-                        name="passengers"
-                        min="1"
-                        value={bookingDetails.passengers}
-                        onChange={(e) =>
-                          handleBookingChange({
-                            target: { name: "passengers", value: parseInt(e.target.value) || 1 },
-                          })
-                        }
-                      />
-                    </div>
-                    <p>
-                      <strong>Total Price:</strong> ₹{calculateTotalPrice()}
-                    </p>
-                    <button className="confirm-booking" onClick={confirmBooking}>
-                      Confirm Booking
-                    </button>
-                  </div>
-                )}
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Modal for Booking */}
+        {bookingDetails && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h3>Book Your Tickets</h3>
+              <div className="booking-inputs">
+                <label>Date of Travel:</label>
+                <input
+                  type="date"
+                  name="date"
+                  value={bookingDetails.date}
+                  onChange={handleBookingChange}
+                />
+                <label>Number of Passengers:</label>
+                <input
+                  type="number"
+                  name="passengers"
+                  min="1"
+                  value={bookingDetails.passengers}
+                  onChange={(e) =>
+                    handleBookingChange({
+                      target: { name: "passengers", value: parseInt(e.target.value) || 1 },
+                    })
+                  }
+                />
+              </div>
+              <p>
+                <strong>Total Price:</strong> ₹{calculateTotalPrice()}
+              </p>
+              <div className="modal-buttons">
+                <button className="confirm-booking" onClick={confirmBooking}>
+                  Confirm Booking
+                </button>
+                <button className="cancel-booking" onClick={closeModal}>
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

@@ -3,14 +3,14 @@ import axios from "axios";
 import "../styles/flights.css"; // Import your CSS
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import videoBg from "../images/flightbooking.mp4"; // Replace with correct path to your video
+import videoBg from "../images/flightbooking.mp4"; // Replace with the correct path to your video
 
 const FlightDetails = () => {
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [flightData, setFlightData] = useState([]);
   const [error, setError] = useState("");
-  const [bookingDetails, setBookingDetails] = useState(null); // Track which flight is being booked
+  const [bookingDetails, setBookingDetails] = useState(null); // Track booking details
 
   // Fetch flight details function
   const fetchFlightDetails = async () => {
@@ -18,21 +18,16 @@ const FlightDetails = () => {
       setError(""); // Clear previous errors
       setFlightData([]); // Reset previous data
 
-      // Validate inputs
       if (!origin || !destination) {
         setError("Please enter both origin and destination.");
         return;
       }
 
-      // API request to fetch flight details
       const response = await axios.get("http://localhost:3000/api/flights", {
         params: { origin, destination },
       });
-
-      // Update state with flight data
       setFlightData(response.data);
     } catch (err) {
-      // Handle errors
       if (err.response && err.response.status === 404) {
         setError("No flights found for the specified locations.");
       } else {
@@ -41,13 +36,13 @@ const FlightDetails = () => {
     }
   };
 
-  // Function to open booking section
+  // Function to open the booking modal
   const handleBookNow = (flight) => {
     setBookingDetails({
       flight_name: flight.flight_name,
       flight_number: flight.flight_number,
-      price_per_person: flight.price, // Set the base price
-      passengers: 1, // Default to 1 passenger
+      price_per_person: flight.price,
+      passengers: 1,
       date: "",
     });
   };
@@ -79,6 +74,7 @@ const FlightDetails = () => {
         <source src={videoBg} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
+
       <div className="flight-details-container">
         <h1>Search Flight Details</h1>
         <div className="input-fields">
@@ -131,45 +127,53 @@ const FlightDetails = () => {
                 >
                   Book Now
                 </button>
-
-                {/* Booking Section */}
-                {bookingDetails?.flight_number === flight.flight_number && (
-                  <div className="booking-section">
-                    <h3>Book Your Flight</h3>
-                    <div className="booking-inputs">
-                      <label>Date of Travel:</label>
-                      <input
-                        type="date"
-                        name="date"
-                        value={bookingDetails.date}
-                        onChange={handleBookingChange}
-                      />
-                      <label>Number of Passengers:</label>
-                      <input
-                        type="number"
-                        name="passengers"
-                        min="1"
-                        value={bookingDetails.passengers}
-                        onChange={(e) =>
-                          handleBookingChange({
-                            target: { name: "passengers", value: parseInt(e.target.value) || 1 },
-                          })
-                        }
-                      />
-                    </div>
-                    <p>
-                      <strong>Total Price:</strong> ₹{calculateTotalPrice()}
-                    </p>
-                    <button className="confirm-booking" onClick={confirmBooking}>
-                      Confirm Booking
-                    </button>
-                  </div>
-                )}
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {bookingDetails && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Book Your Flight</h3>
+            <div className="booking-inputs">
+              <label>Date of Travel:</label>
+              <input
+                type="date"
+                name="date"
+                value={bookingDetails.date}
+                onChange={handleBookingChange}
+              />
+              <label>Number of Passengers:</label>
+              <input
+                type="number"
+                name="passengers"
+                min="1"
+                value={bookingDetails.passengers}
+                onChange={(e) =>
+                  handleBookingChange({
+                    target: {
+                      name: "passengers",
+                      value: parseInt(e.target.value) || 1,
+                    },
+                  })
+                }
+              />
+            </div>
+            <p>
+              <strong>Total Price:</strong> ₹{calculateTotalPrice()}
+            </p>
+            <button className="confirm-booking" onClick={confirmBooking}>
+              Confirm Booking
+            </button>
+            <button className="cancel-booking" onClick={() => setBookingDetails(null)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* <Footer /> */}
     </>
   );
